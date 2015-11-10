@@ -4,6 +4,7 @@
 import boto3
 import uuid
 import json
+import ec2Limits
 
 # Instantiate a new client for AWS Support API and SNS.
 
@@ -42,6 +43,26 @@ def makeMessage(warn_list):
 	sns_message += '\n ------------------------'
 	for rs in warn_list:
 		sns_message += '\n' + rs 
+	
+	sns_message += '\n'
+	sns_message += '\n EC2 Usage:'
+	sns_message += '\n ------------------------'
+	sns_message += '\n us-east-1:'
+	sns_message += '\n Instance Limit: '
+	sns_message += ec2Limits.get_limit('us-east-1')
+	sns_message += '\n Instance Usage: '
+	sns_message += ec2Limits.get_actual('us-east-1')
+	sns_message += '\n us-west-1:'
+	sns_message += '\n Instance Limit: ' 
+	sns_message += ec2Limits.get_limit('us-west-1')
+	sns_message += '\n Instance Usage: ' 
+	sns_message +=  ec2Limits.get_actual('us-west-1')
+	sns_message += '\n us-west-2:'
+	sns_message += '\n Instance Limit: '
+	sns_message += ec2Limits.get_limit('us-west-2')
+	sns_message += '\n Instance Usage: ' 
+	sns_message += ec2Limits.get_actual('us-west-2')
+	print sns_message
 
 	return sns_message;
 
@@ -61,6 +82,3 @@ def lambda_handler(event, context):
 	publishSNS(warn_list, sns_client, sns_arn);
 
 	return;	
-##
-# todo: insert meaningful text into the SNS message relating to the specific resources that were flagged
-##:

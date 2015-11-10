@@ -15,13 +15,8 @@ def json_serial(obj):
         return serial
     raise TypeError ("Type not serializable")
 
-def instance_limit(region):
+def get_limit(region):
 	ec2_client = boto3.client('ec2', region_name=region)
-	print "For Region: "+region
-	get_limit(ec2_client)
-	get_actual(ec2_client)
-
-def get_limit(ec2_client):
 	response = ec2_client.describe_account_attributes()
 
 	attribute_list = response['AccountAttributes']
@@ -32,15 +27,19 @@ def get_limit(ec2_client):
 			print max_instances
 	return max_instances;
 
-def get_actual(ec2_client):
-	response_two = ec2_client.describe_instances()
-	instance_list = response_two['Reservations']
+def get_actual(region):
+	ec2_client = boto3.client('ec2', region_name=region)
+	response = ec2_client.describe_instances()
+	instance_list = response['Reservations']
 	print "Number of instances: "
-	num_of_instances = len(instance_list)
+	num_of_instances = str(len(instance_list))
 	print num_of_instances
 	return num_of_instances;
 
 	# print json.dumps(instance_list, indent=4, separators=(',', ': '), default=json_serial)
 
 # instance_limit('us-east-1')
+# print "For Region: us-east-1"
+# get_limit('us-east-1')
+# get_actual('us-east-1')
 
