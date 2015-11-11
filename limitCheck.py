@@ -5,6 +5,7 @@ import boto3
 import uuid
 import json
 import ec2Limits
+import cloudformationLimits
 
 # Instantiate a new client for AWS Support API and SNS.
 
@@ -47,21 +48,38 @@ def makeMessage(warn_list):
 	sns_message += '\n'
 	sns_message += '\n EC2 Usage:'
 	sns_message += '\n ------------------------'
-	sns_message += '\n us-east-1:'
+	sns_message += '\n Region: us-east-1:'
 	sns_message += '\n Instance Limit: '
 	sns_message += ec2Limits.get_limit('us-east-1')
 	sns_message += '\n Instance Usage: '
 	sns_message += ec2Limits.get_actual('us-east-1')
-	sns_message += '\n us-west-1:'
+	sns_message += '\n Region: us-west-1:'
 	sns_message += '\n Instance Limit: ' 
 	sns_message += ec2Limits.get_limit('us-west-1')
 	sns_message += '\n Instance Usage: ' 
 	sns_message +=  ec2Limits.get_actual('us-west-1')
-	sns_message += '\n us-west-2:'
+	sns_message += '\n Region: us-west-2:'
 	sns_message += '\n Instance Limit: '
 	sns_message += ec2Limits.get_limit('us-west-2')
 	sns_message += '\n Instance Usage: ' 
 	sns_message += ec2Limits.get_actual('us-west-2')
+
+	sns_message += '\n'
+	sns_message += '\n'
+
+	sns_message += '\n Cloudformation Usage:'
+	sns_message += '\n -------------------------'
+	sns_message += '\n Region: us-east-1:'
+	sns_message += '\n Stack Limit: '
+	sns_message += cloudformationLimits.get_limit('us-east-1')
+	sns_message += '\n Actual Stacks: '
+	sns_message += cloudformationLimits.get_actual('us-east-1')
+	sns_message += '\n'
+	sns_message += '\n Region: us-west-1:'
+	sns_message += '\n Stack Limit: '
+	sns_message += cloudformationLimits.get_limit('us-west-1')
+	sns_message += '\n Actual Stacks: '
+	sns_message += cloudformationLimits.get_actual('us-west-1')
 	print sns_message
 
 	return sns_message;
