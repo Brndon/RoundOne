@@ -14,6 +14,8 @@ sns_client = boto3.client('sns', region_name='us-west-2')
 
 # SNS ARN. This should be replaced with the name of the topic ARN that you want to publish
 sns_arn = "arn:aws:sns:us-west-2:141820633316:AWS-Limits"
+# Configure the regions that you want to poll in the list below
+regions = ['us-east-1', 'us-west-1', 'us-west-2', 'ap-northeast-1']
 
 
 def limitPoll():	
@@ -48,42 +50,29 @@ def makeMessage(warn_list):
 	sns_message += '\n'
 	sns_message += '\n EC2 Usage:'
 	sns_message += '\n ------------------------'
-	sns_message += '\n Region: us-east-1:'
-	sns_message += '\n Instance Limit: '
-	sns_message += ec2Limits.get_limit('us-east-1')
-	sns_message += '\n Instance Usage: '
-	sns_message += ec2Limits.get_actual('us-east-1')
-	sns_message += '\n Region: us-west-1:'
-	sns_message += '\n Instance Limit: ' 
-	sns_message += ec2Limits.get_limit('us-west-1')
-	sns_message += '\n Instance Usage: ' 
-	sns_message +=  ec2Limits.get_actual('us-west-1')
-	sns_message += '\n Region: us-west-2:'
-	sns_message += '\n Instance Limit: '
-	sns_message += ec2Limits.get_limit('us-west-2')
-	sns_message += '\n Instance Usage: ' 
-	sns_message += ec2Limits.get_actual('us-west-2')
+	for rgn in regions:
+		sns_message += "\n Region: " + rgn
+		sns_message += "\n Instance Limit: "
+		sns_message += ec2Limits.get_limit(rgn)
+		sns_message += "\n Actual Usage: "
+		sns_message += ec2Limits.get_actual(rgn)
+		sns_message += "\n"
 
 	sns_message += '\n'
-	sns_message += '\n'
-
 	sns_message += '\n Cloudformation Usage:'
 	sns_message += '\n -------------------------'
-	sns_message += '\n Region: us-east-1:'
-	sns_message += '\n Stack Limit: '
-	sns_message += cloudformationLimits.get_limit('us-east-1')
-	sns_message += '\n Actual Stacks: '
-	sns_message += cloudformationLimits.get_actual('us-east-1')
-	sns_message += '\n'
-	sns_message += '\n Region: us-west-1:'
-	sns_message += '\n Stack Limit: '
-	sns_message += cloudformationLimits.get_limit('us-west-1')
-	sns_message += '\n Actual Stacks: '
-	sns_message += cloudformationLimits.get_actual('us-west-1')
+	for rgn in regions:
+		sns_message += "\n Region: " + rgn
+		sns_message += "\n Stack Limit: "
+		sns_message += cloudformationLimits.get_limit(rgn)
+		sns_message += "\n Actual Stacks: "
+		sns_message += cloudformationLimits.get_actual(rgn)
+		sns_message += "\n"
+
+
 	print sns_message
 
 	return sns_message;
-
 
 def lambda_handler(event, context):
 
