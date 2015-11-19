@@ -6,16 +6,27 @@ import uuid
 import json
 import ec2Limits
 import cloudformationLimits
+import ConfigParser
 
 # Instantiate a new client for AWS Support API and SNS.
+config = ConfigParser.ConfigParser()
+config_dict = {}
+regions = []
+config.read("default.config")
+options = config.options('Settings')
+for option in options:
+	config_dict[option] = config.get('Settings', option)
+
+sns_arn = config_dict['arn']
+regions = config_dict['regions'].split(',')
 
 support_client = boto3.client('support', region_name='us-east-1')
 sns_client = boto3.client('sns', region_name='us-west-2')
 
 # SNS ARN. This should be replaced with the name of the topic ARN that you want to publish
-sns_arn = "arn:aws:sns:us-west-2:141820633316:AWS-Limits"
+# sns_arn = "arn:aws:sns:us-west-2:141820633316:AWS-Limits"
 # Configure the regions that you want to poll in the list below
-regions = ['us-east-1', 'us-west-1', 'us-west-2', 'ap-northeast-1']
+# # regions = ['us-east-1', 'us-west-1', 'us-west-2', 'ap-northeast-1']
 
 
 def limitPoll():	
