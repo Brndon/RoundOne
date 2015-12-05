@@ -5,6 +5,7 @@ import boto3
 import uuid
 import json
 import ec2Limits
+import rdsLimits
 import cloudformationLimits
 import ConfigParser
 
@@ -27,7 +28,6 @@ sns_client = boto3.client('sns', region_name='us-west-2')
 # sns_arn = "arn:aws:sns:us-west-2:141820633316:AWS-Limits"
 # Configure the regions that you want to poll in the list below
 # # regions = ['us-east-1', 'us-west-1', 'us-west-2', 'ap-northeast-1']
-
 
 def limitPoll():	
 	# call trusted advisor for the limit checks
@@ -62,27 +62,48 @@ def makeMessage(warn_list):
 	sns_message += '\n EC2 Usage:'
 	sns_message += '\n ------------------------'
 	for rgn in regions:
+	#	if (float(ec2Limits.get_actual(rgn)) / float(ec2Limits.get_limit(rgn)) >= 0.8):
 		sns_message += "\n Region: " + rgn
 		sns_message += "\n Instance Limit: "
 		sns_message += ec2Limits.get_limit(rgn)
 		sns_message += "\n Actual Usage: "
 		sns_message += ec2Limits.get_actual(rgn)
 		sns_message += "\n"
+	#	else:
+	#		sns_message += "\n Region: " + rgn
+	#		sns_message += "\n All Green \n"
+
+	sns_message += '\n'
+	sns_message += '\n RDS Usage:'
+	sns_message += '\n ------------------------'
+	for rgn in regions:
+		rdsLimit, rdsActual = rdsLimits.get_limit(rgn)
+		sns_message += "\n Region: " + rgn
+		sns_message += "\n Instance Limit: "
+		sns_message += str(rdsLimit)
+		sns_message += "\n Actual Usage: "
+		sns_message += str(rdsActual)
+		sns_message += "\n"
+
+
 
 	sns_message += '\n'
 	sns_message += '\n Cloudformation Usage:'
 	sns_message += '\n -------------------------'
 	for rgn in regions:
+	#	if (int(cloudformationLimits.get_actual(rgn)) / int(cloudformationLimits.get_limit(rgn)) >= 0.8):			
 		sns_message += "\n Region: " + rgn
 		sns_message += "\n Stack Limit: "
 		sns_message += cloudformationLimits.get_limit(rgn)
 		sns_message += "\n Actual Stacks: "
 		sns_message += cloudformationLimits.get_actual(rgn)
 		sns_message += "\n"
+	#	else:
+	#		sns_message += "\n Region: " + rgn
+	#		sns_message += "\n All Green \n"
 
 
 	print sns_message
-
 	return sns_message;
 
 def lambda_handler(event, context):
@@ -100,3 +121,10 @@ def lambda_handler(event, context):
 	publishSNS(warn_list, sns_client, sns_arn);
 
 	return;	
+
+
+#test mode
+#warn_list = []
+#makeMessage(warn_list)
+
+
